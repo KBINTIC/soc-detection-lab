@@ -1,0 +1,31 @@
+title: M365 Inbox Rule Forwarding Or Redirecting Mail
+id: b5eb7ce7-a10e-4f4e-8b65-b0e3606e05dd
+status: experimental
+description: |
+  Detects creation or modification of an Exchange Online inbox rule that forwards or redirects messages.
+  After a business email compromise, attackers create such rules to silently exfiltrate mail
+  (invoices, bank details) and hide replies from the victim.
+references:
+  - https://learn.microsoft.com/en-us/defender-office-365/detect-and-remediate-outlook-rules-forms-attack
+author: Khalid Bahiri
+date: 2026-10-01
+tags:
+  - attack.collection
+  - attack.t1114.003
+logsource:
+  product: m365
+  service: audit
+detection:
+  selection_op:
+    Operation:
+      - 'New-InboxRule'
+      - 'Set-InboxRule'
+  selection_param:
+    Parameters|contains:
+      - 'ForwardTo'
+      - 'ForwardAsAttachmentTo'
+      - 'RedirectTo'
+  condition: all of selection_*
+falsepositives:
+  - Users legitimately forwarding to a personal or partner mailbox (should be policy-checked anyway)
+level: high

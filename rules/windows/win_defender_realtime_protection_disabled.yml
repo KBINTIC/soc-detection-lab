@@ -1,0 +1,26 @@
+title: Microsoft Defender Real-Time Protection Disabled
+id: e7901f27-5aa3-4eaf-bc30-34fa1b8d8ba6
+status: experimental
+description: |
+  Detects when Microsoft Defender Antivirus real-time protection is turned off (event 5001).
+  Attackers and ransomware operators routinely disable the local antivirus before dropping payloads.
+  On endpoints protected by a third-party EDR (e.g. Bitdefender GravityZone), Defender is expected to be
+  passive, so tune this rule per fleet.
+references:
+  - https://learn.microsoft.com/en-us/defender-endpoint/troubleshoot-microsoft-defender-antivirus
+author: Khalid Bahiri
+date: 2026-10-01
+tags:
+  - attack.defense-evasion
+  - attack.t1562.001
+logsource:
+  product: windows
+  service: windefend
+detection:
+  selection:
+    EventID: 5001
+  condition: selection
+falsepositives:
+  - Administrator troubleshooting
+  - Third-party antivirus/EDR installation switching Defender to passive mode
+level: high

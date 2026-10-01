@@ -1,0 +1,27 @@
+<!--
+  Microsoft 365 audit collection for the Wazuh manager.
+  1. Copy this file to office365.local.xml (git-ignored: it contains a secret).
+  2. Fill in the values from your Entra ID app registration (see lab/README.md, section 4).
+  3. Re-run lab/setup.sh, or append the block manually and restart the manager.
+  Use a TEST tenant or test users only - never a client tenant for lab work.
+-->
+<ossec_config>
+  <office365>
+    <enabled>yes</enabled>
+    <only_future_events>yes</only_future_events>
+    <interval>5m</interval>
+    <curl_max_size>1M</curl_max_size>
+    <api_auth>
+      <tenant_id>YOUR_TENANT_ID</tenant_id>
+      <client_id>YOUR_CLIENT_ID</client_id>
+      <client_secret>YOUR_CLIENT_SECRET</client_secret>
+      <api_type>commercial</api_type>
+    </api_auth>
+    <subscriptions>
+      <subscription>Audit.AzureActiveDirectory</subscription>
+      <subscription>Audit.Exchange</subscription>
+      <subscription>Audit.SharePoint</subscription>
+      <subscription>Audit.General</subscription>
+    </subscriptions>
+  </office365>
+</ossec_config>

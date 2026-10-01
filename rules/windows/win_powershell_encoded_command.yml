@@ -1,0 +1,36 @@
+title: PowerShell Launched With Encoded Command
+id: 604cb07b-1a57-43fb-a08f-c0f13dad00f0
+status: experimental
+description: |
+  Detects PowerShell started with a Base64-encoded command line (-EncodedCommand and its abbreviations).
+  Encoding is widely used by malware droppers and phishing macros to hide the real payload from simple inspection.
+references:
+  - https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh
+author: Khalid Bahiri
+date: 2026-10-01
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.defense-evasion
+  - attack.t1027
+logsource:
+  product: windows
+  category: process_creation
+detection:
+  selection_img:
+    - Image|endswith:
+        - '\powershell.exe'
+        - '\pwsh.exe'
+    - OriginalFileName:
+        - 'PowerShell.EXE'
+        - 'pwsh.dll'
+  selection_cli:
+    CommandLine|contains:
+      - ' -enc '
+      - ' -ec '
+      - ' -EncodedCommand '
+      - ' -en '
+  condition: all of selection_*
+falsepositives:
+  - Some legitimate management agents and RMM tools use encoded commands; baseline them first
+level: medium

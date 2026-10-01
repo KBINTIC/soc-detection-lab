@@ -1,0 +1,24 @@
+<!--
+  Minimal Sysmon configuration for this lab (deliberately small and readable).
+  Install:   Sysmon64.exe -accepteula -i sysmon-lab.xml   (Sysmon64a.exe on Windows ARM)
+  Update:    Sysmon64.exe -c sysmon-lab.xml
+  For a production-grade baseline, look at SwiftOnSecurity/sysmon-config or olafhartong/sysmon-modular.
+-->
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>sha256</HashAlgorithms>
+  <EventFiltering>
+    <!-- Event 1: log every process creation -->
+    <RuleGroup name="process" groupRelation="or">
+      <ProcessCreate onmatch="exclude" />
+    </RuleGroup>
+    <!-- Events 12/13/14: registry changes on security-relevant keys only -->
+    <RuleGroup name="registry" groupRelation="or">
+      <RegistryEvent onmatch="include">
+        <TargetObject condition="contains">\SOFTWARE\Policies\</TargetObject>
+        <TargetObject condition="contains">\CurrentVersion\Run</TargetObject>
+        <TargetObject condition="contains">\Control\Lsa\</TargetObject>
+        <TargetObject condition="contains">\Services\NetBT\Parameters</TargetObject>
+      </RegistryEvent>
+    </RuleGroup>
+  </EventFiltering>
+</Sysmon>

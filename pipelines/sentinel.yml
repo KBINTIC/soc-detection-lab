@@ -1,0 +1,141 @@
+# pySigma processing pipeline: Sigma -> Microsoft Sentinel (KQL)
+# Use with: sigma convert -t kusto -p pipelines/sentinel.yml rules/
+#
+# Table choices
+#   windows/security        -> SecurityEvent           (Windows Security Events via AMA)
+#   windows/windefend       -> Event                   (Defender Operational channel via AMA/DCR)
+#   windows/process_creation-> imProcessCreate         (ASIM parser, fed by Sysmon or 4688)
+#   windows/registry_set    -> imRegistry              (ASIM parser, fed by Sysmon)
+#   m365/audit              -> OfficeActivity          (Microsoft 365 connector)
+name: Sigma to Microsoft Sentinel (lab)
+priority: 100
+transformations:
+  # ---------- Windows Security log ----------
+  - id: sentinel_table_security
+    type: set_state
+    key: query_table
+    val: SecurityEvent
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+
+  # ---------- Microsoft Defender Operational log ----------
+  - id: sentinel_table_windefend
+    type: set_state
+    key: query_table
+    val: Event
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: windefend
+  - id: sentinel_cond_windefend
+    type: add_condition
+    conditions:
+      Source: Microsoft-Windows-Windows Defender
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: windefend
+
+  # ---------- Process creation (ASIM) ----------
+  - id: sentinel_table_process_creation
+    type: set_state
+    key: query_table
+    val: imProcessCreate
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation
+  - id: sentinel_fields_process_creation
+    type: field_name_mapping
+    mapping:
+      Image: TargetProcessName
+      CommandLine: TargetProcessCommandLine
+      OriginalFileName: TargetProcessFileOriginalName
+      ParentImage: ActingProcessName
+      ParentCommandLine: ActingProcessCommandLine
+      User: TargetUsername
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation
+
+  # ---------- Registry (ASIM) ----------
+  # Sigma's TargetObject is "key\value name"; ASIM splits it into RegistryKey + RegistryValue,
+  # so we rebuild it before filtering. Sysmon renders DWORDs as "DWORD (0x00000001)", ASIM as "1".
+  - id: sentinel_table_registry
+    type: set_state
+    key: query_table
+    val: imRegistry
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_set
+  - id: sentinel_extend_registry
+    type: set_state
+    key: extend
+    val: 'extend TargetObject = strcat(RegistryKey, "\\", RegistryValue)'
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_set
+  - id: sentinel_value_registry
+    type: map_string
+    mapping:
+      'DWORD (0x00000000)': '0'
+      'DWORD (0x00000001)': '1'
+    field_name_conditions:
+      - type: include_fields
+        fields:
+          - Details
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_set
+  - id: sentinel_fields_registry
+    type: field_name_mapping
+    mapping:
+      Details: RegistryValueData
+      Image: ActingProcessName
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_set
+
+  # ---------- Microsoft 365 unified audit log ----------
+  # OfficeActivity keeps the unified audit log field names (Operation, Parameters, Workload...).
+  - id: sentinel_table_m365
+    type: set_state
+    key: query_table
+    val: OfficeActivity
+    rule_conditions:
+      - type: logsource
+        product: m365
+
+  # Any rule that reached this point without a table is unsupported.
+  - id: sentinel_unsupported
+    type: rule_failure
+    message: No Sentinel table mapping for this log source - extend pipelines/sentinel.yml
+    rule_cond_not: true
+    rule_cond_op: or
+    rule_conditions:
+      - type: processing_item_applied
+        processing_item_id: sentinel_table_security
+      - type: processing_item_applied
+        processing_item_id: sentinel_table_windefend
+      - type: processing_item_applied
+        processing_item_id: sentinel_table_process_creation
+      - type: processing_item_applied
+        processing_item_id: sentinel_table_registry
+      - type: processing_item_applied
+        processing_item_id: sentinel_table_m365
+
+postprocessing:
+  - type: template
+    template: |-
+      {{ pipeline.state.query_table }}
+      {%- if pipeline.state.extend %}
+      | {{ pipeline.state.extend }}
+      {%- endif %}
+      | where {{ query }}

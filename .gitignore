@@ -1,0 +1,7 @@
+build/
+lab/wazuh-docker/
+lab/agent/*.local.xml
+lab/manager/*.local.xml
+.venv/
+__pycache__/
+.DS_Store

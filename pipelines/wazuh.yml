@@ -1,0 +1,107 @@
+# pySigma processing pipeline: Sigma -> Wazuh indexer (OpenSearch Lucene)
+# Use with: sigma convert -t opensearch_lucene -p pipelines/wazuh.yml rules/
+#
+# Wazuh decodes Windows events into data.win.system.* / data.win.eventdata.* with
+# camelCase names (CommandLine -> commandLine), and Microsoft 365 audit records into data.office365.*.
+# Queries are meant for the "wazuh-archives-*" index pattern (all events), see lab/README.md.
+name: Sigma to Wazuh (lab)
+priority: 100
+transformations:
+  # ---------- Windows: log source conditions (Sigma field names, mapped below) ----------
+  - id: wazuh_cond_security
+    type: add_condition
+    conditions:
+      Channel: Security
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: security
+  - id: wazuh_cond_windefend
+    type: add_condition
+    conditions:
+      Channel: Microsoft-Windows-Windows Defender/Operational
+    rule_conditions:
+      - type: logsource
+        product: windows
+        service: windefend
+  - id: wazuh_cond_process_creation
+    type: add_condition
+    conditions:
+      Channel: Microsoft-Windows-Sysmon/Operational
+      EventID: 1
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: process_creation
+  - id: wazuh_cond_registry_set
+    type: add_condition
+    conditions:
+      Channel: Microsoft-Windows-Sysmon/Operational
+      EventID: 13
+    rule_conditions:
+      - type: logsource
+        product: windows
+        category: registry_set
+
+  # ---------- Windows: field names ----------
+  - id: wazuh_fields_windows_system
+    type: field_name_mapping
+    mapping:
+      EventID: data.win.system.eventID
+      Channel: data.win.system.channel
+      Provider_Name: data.win.system.providerName
+      Computer: data.win.system.computer
+    rule_conditions:
+      - type: logsource
+        product: windows
+  - id: wazuh_fields_windows_eventdata
+    # Event data fields: data.win.eventdata.<lowerCamelCase>
+    type: field_name_mapping
+    mapping:
+      CommandLine: data.win.eventdata.commandLine
+      Image: data.win.eventdata.image
+      OriginalFileName: data.win.eventdata.originalFileName
+      ParentImage: data.win.eventdata.parentImage
+      ParentCommandLine: data.win.eventdata.parentCommandLine
+      User: data.win.eventdata.user
+      TargetObject: data.win.eventdata.targetObject
+      Details: data.win.eventdata.details
+      EventType: data.win.eventdata.eventType
+      TargetSid: data.win.eventdata.targetSid
+      MemberSid: data.win.eventdata.memberSid
+      SubjectUserName: data.win.eventdata.subjectUserName
+      TargetUserName: data.win.eventdata.targetUserName
+    rule_conditions:
+      - type: logsource
+        product: windows
+
+  # ---------- Microsoft 365 (Wazuh office365 module) ----------
+  - id: wazuh_cond_m365
+    type: add_condition
+    conditions:
+      rule.groups: office365
+    rule_conditions:
+      - type: logsource
+        product: m365
+  - id: wazuh_fields_m365_parameters
+    # Wazuh keeps Parameters as a list of {Name, Value} objects: search both.
+    type: field_name_mapping
+    mapping:
+      Parameters:
+        - data.office365.Parameters.Name
+        - data.office365.Parameters.Value
+    rule_conditions:
+      - type: logsource
+        product: m365
+  - id: wazuh_fields_m365
+    type: field_name_prefix
+    prefix: data.office365.
+    field_name_conditions:
+      - type: exclude_fields
+        fields:
+          - rule.groups
+          - data.office365.Parameters.Name
+          - data.office365.Parameters.Value
+    rule_conditions:
+      - type: logsource
+        product: m365

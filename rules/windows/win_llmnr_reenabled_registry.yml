@@ -1,0 +1,27 @@
+title: LLMNR Re-Enabled Through Registry Policy
+id: ad795bcc-b58f-40da-a797-565caa9baa34
+status: experimental
+description: |
+  Detects the DNS client policy value EnableMulticast being set to 1, which re-enables LLMNR.
+  LLMNR is commonly disabled during hardening because it enables credential capture (Responder-style poisoning);
+  re-enabling it on a hardened workstation is suspicious.
+references:
+  - https://attack.mitre.org/techniques/T1557/001/
+author: Khalid Bahiri
+date: 2026-10-01
+tags:
+  - attack.credential-access
+  - attack.t1557.001
+  - attack.defense-evasion
+  - attack.t1112
+logsource:
+  product: windows
+  category: registry_set
+detection:
+  selection:
+    TargetObject|endswith: '\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient\EnableMulticast'
+    Details: 'DWORD (0x00000001)'
+  condition: selection
+falsepositives:
+  - Rollback of a hardening GPO
+level: medium

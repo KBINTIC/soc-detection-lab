@@ -1,0 +1,13 @@
+<!--
+  Add inside <ossec_config> of C:\Program Files (x86)\ossec-agent\ossec.conf on the Windows VM,
+  then restart the agent:  Restart-Service WazuhSvc
+  The Security channel is already collected by default.
+-->
+<localfile>
+  <location>Microsoft-Windows-Sysmon/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>
+<localfile>
+  <location>Microsoft-Windows-Windows Defender/Operational</location>
+  <log_format>eventchannel</log_format>
+</localfile>

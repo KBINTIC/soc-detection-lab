@@ -1,0 +1,25 @@
+title: M365 MFA Disabled For A User
+id: 2407f8f1-0109-4451-b720-1ab5e43dc26b
+status: experimental
+description: |
+  Detects per-user MFA (Strong Authentication) being disabled in Entra ID, as recorded in the Microsoft 365 unified audit log.
+  Removing MFA is a common step to keep persistent access to a compromised account.
+references:
+  - https://learn.microsoft.com/en-us/entra/identity/authentication/howto-mfa-userstates
+author: Khalid Bahiri
+date: 2026-10-01
+tags:
+  - attack.persistence
+  - attack.defense-evasion
+  - attack.t1556.006
+logsource:
+  product: m365
+  service: audit
+detection:
+  selection:
+    Workload: 'AzureActiveDirectory'
+    Operation: 'Disable Strong Authentication.'
+  condition: selection
+falsepositives:
+  - Planned migration from per-user MFA to Conditional Access
+level: high
