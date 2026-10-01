@@ -14,6 +14,20 @@ The **Simulate** column gives a safe command to trigger the rule in the lab. Run
 | [M365 MFA disabled for a user](../rules/m365/m365_mfa_disabled_for_user.yml) | T1556.006 | high | M365 unified audit log |
 | [M365 FullAccess granted on a mailbox](../rules/m365/m365_mailbox_fullaccess_granted.yml) | T1098.002 | medium | M365 unified audit log |
 
+## Lab validation results
+
+Tested on 2026-10-01: Windows 11 ARM64 VM (UTM on Apple Silicon), Sysmon (Sysmon64a), Wazuh agent and manager 4.14.8.
+Each rule's simulation was run, then the Wazuh query was executed in Discover on `wazuh-archives-*`.
+
+| Rule | Event | Result |
+|---|---|---|
+| Security event log cleared | Security 1102 | ✅ detected (1 hit) |
+| Member added to local Administrators | Security 4732 | ✅ detected (1 hit) |
+| PowerShell with encoded command | Sysmon 1 | ✅ detected (1 hit) |
+| LLMNR re-enabled via registry | Sysmon 13 | ✅ detected (1 hit) |
+| Defender real-time protection disabled | Defender 5001 | ⏳ pending (needs Tamper Protection off) |
+| M365 rules (3) | Unified audit log | ⏳ pending (needs a test tenant) |
+
 ## Simulate (Windows VM, elevated PowerShell)
 
 ```powershell
@@ -30,8 +44,8 @@ powershell.exe -enc VwByAGkAdABlAC0ASABvAHMAdAAgACIAcwBpAGcAbQBhACAAbABhAGIAIAB0
 # 4. Local admin group change (make sure group management auditing is on)
 auditpol /set /subcategory:"{0CCE9237-69AE-11D9-BED3-505054503030}" /success:enable   # Security Group Management (works on any Windows language)
 net user labuser 'L@b-Only-2026!' /add
-net localgroup Administrators labuser /add
-net localgroup Administrators labuser /delete
+Add-LocalGroupMember -SID 'S-1-5-32-544' -Member labuser      # SID = any Windows language
+Remove-LocalGroupMember -SID 'S-1-5-32-544' -Member labuser
 net user labuser /delete
 
 # 5. LLMNR re-enabled, then hardened again
