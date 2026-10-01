@@ -42,6 +42,15 @@ if [ ! -f config/wazuh_indexer_ssl_certs/root-ca.pem ]; then
   docker compose -f generate-indexer-certs.yml run --rm generator
 fi
 
+# macOS / Docker Desktop: the generator often fails to write root-ca-manager.*
+# ("Permission denied"), and Docker then mounts an empty directory instead of the file.
+C=config/wazuh_indexer_ssl_certs
+for ext in pem key; do
+  [ -d "$C/root-ca-manager.$ext" ] && rmdir "$C/root-ca-manager.$ext"
+  [ -f "$C/root-ca-manager.$ext" ] || cp "$C/root-ca.$ext" "$C/root-ca-manager.$ext"
+done
+chmod 755 "$C"; chmod 644 "$C"/*.pem "$C"/*.key
+
 say "Starting Wazuh (first start takes a few minutes)"
 docker compose up -d
 
