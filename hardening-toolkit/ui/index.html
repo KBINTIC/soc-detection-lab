@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Durcissement Poste — Console</title>
+<style>
+:root{
+  --bg:#f5f7fa;--card:#ffffff;--ink:#17202e;--mut:#5a6677;--line:#e5e9f0;
+  --accent:#2f5bea;--ok:#1a7f52;--ko:#c23b45;--warn:#b7791f;--na:#8893a4;
+  --code:#0f1722;--codeink:#d7e2f4;--shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.1)
+}
+:root:not([data-theme=light]) @media(prefers-color-scheme:dark){}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0e131b;--card:#151d28;--ink:#e9edf4;--mut:#9aa6b6;--line:#253040;
+  --accent:#6f92ff;--ok:#4cc38a;--ko:#f06b73;--warn:#e0a84a;--na:#7d8697;
+  --code:#0a0f16;--codeink:#cfe0f5;--shadow:none
+}}
+:root[data-theme=dark]{
+  --bg:#0e131b;--card:#151d28;--ink:#e9edf4;--mut:#9aa6b6;--line:#253040;
+  --accent:#6f92ff;--ok:#4cc38a;--ko:#f06b73;--warn:#e0a84a;--na:#7d8697;
+  --code:#0a0f16;--codeink:#cfe0f5;--shadow:none
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-size:23px;margin:0}
+.tag{color:var(--mut);font-size:13px}
+.lead{color:var(--mut);margin:6px 0 24px;max-width:70ch}
+.principle{background:color-mix(in srgb,var(--accent) 9%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
+  border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:28px}
+.principle b{color:var(--accent)}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:18px 18px 16px;margin-bottom:14px;box-shadow:var(--shadow);position:relative}
+.step .num{position:absolute;top:-11px;left:16px;width:26px;height:26px;border-radius:50%;
+  background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center}
+.step h2{font-size:16px;margin:4px 0 2px;display:flex;align-items:center;gap:8px}
+.step .file{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:var(--mut)}
+.step p{margin:8px 0 10px;color:var(--ink)}
+.step .place{font-size:13px;color:var(--mut);margin:0 0 10px}
+.step .place b{color:var(--ink)}
+.cmd{display:flex;align-items:stretch;gap:0;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.cmd code{flex:1;background:var(--code);color:var(--codeink);padding:9px 12px;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:pre-wrap;word-break:break-word}
+.cmd button{border:none;background:var(--accent);color:#fff;padding:0 14px;font-weight:600;cursor:pointer;font-size:13px}
+.cmd button:active{transform:translateY(1px)}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}
+.pill{font-size:11.5px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.pill.read{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.pill.write{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent)}
+.pill.undo{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+section.report{margin-top:34px}
+h3{font-size:17px;margin:0 0 4px}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:26px;text-align:center;color:var(--mut);
+  cursor:pointer;background:var(--card)}
+.drop.hot{border-color:var(--accent);color:var(--accent)}
+.kpis{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;flex:1;min-width:120px}
+.kpi .n{font-size:26px;font-weight:700}.kpi .l{font-size:12.5px;color:var(--mut)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;overflow:hidden;margin-top:6px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+tr:last-child td{border-bottom:none}
+.b{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.b.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.b.ko{background:color-mix(in srgb,var(--ko) 16%,transparent);color:var(--ko)}
+.b.na{background:color-mix(in srgb,var(--na) 16%,transparent);color:var(--na)}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:var(--mut)}
+.why{color:var(--mut);font-size:12.5px;margin-top:3px;max-width:48ch}
+.theme{background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;
+  padding:5px 10px;cursor:pointer;font-size:13px}
+footer{margin-top:40px;color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Console de durcissement du poste</h1>
+    <div class="tag">Bahiri Consultant IT · MSP Cybersécurité</div>
+  </div>
+  <button class="theme" id="theme">◐ Thème</button>
+</header>
+<p class="lead">Séquence d'audit et de durcissement d'un poste Windows, dans l'ordre : on prouve d'abord que la
+détection fonctionne, on photographie l'état initial, on corrige avec validation humaine, puis on compare
+avant / après. Chaque script est en PowerShell, lancé dans un terminal <b>administrateur</b>.</p>
+
+<div class="principle">🛡️ <b>Principe :</b> la machine exécute, l'humain décide. Rien n'est corrigé sans votre accord,
+et chaque correction est réversible.</div>
+
+<!-- étapes injectées par JS -->
+<div id="steps"></div>
+
+<section class="report">
+  <h3>Visualiser un rapport</h3>
+  <p class="lead" style="margin:4px 0 12px">Glissez ici un fichier <span class="mono">audit-*.json</span>
+  produit par l'audit (dossier <span class="mono">reports\</span>) pour le lire sans ouvrir PowerShell.</p>
+  <div class="drop" id="drop">Déposer un rapport JSON, ou cliquer pour choisir un fichier</div>
+  <input type="file" id="file" accept="application/json,.json" hidden>
+  <div id="view"></div>
+</section>
+
+<footer>
+  Suite générée pour un usage défensif (audit et durcissement de postes). Les scripts de correction
+  n'agissent qu'après validation, et <span class="mono">99-Undo.ps1</span> rejoue les annulations.
+</footer>
+</div>
+
+<script>
+const STEPS = [
+  {n:1,file:"00-Simulate-Benign.ps1",title:"Tester la détection",place:"scripts\\",
+   kind:["Lab uniquement","Réversible"],
+   desc:"Génère des événements inoffensifs (journal effacé, PowerShell encodé, ajout admin, LLMNR) puis revient à l'état initial. Sert à vérifier que Sysmon, l'agent et les règles voient bien l'attaque, avant toute modification.",
+   cmd:".\\00-Simulate-Benign.ps1"},
+  {n:2,file:"01-Audit.ps1",title:"Photographier l'état initial",place:"scripts\\",
+   kind:["Lecture seule"],
+   desc:"Audite le pare-feu, l'antivirus/EDR, SMBv1, LLMNR, NTLM, RDP/NLA, le compte invité, BitLocker, la journalisation PowerShell et l'audit des comptes. Ne modifie rien. Écrit un rapport « avant » dans reports\\.",
+   cmd:".\\01-Audit.ps1"},
+  {n:3,file:"02-Harden.ps1",title:"Durcir, avec validation",place:"scripts\\",
+   kind:["Modifie","Validation O/N","Réversible"],
+   desc:"Pour chaque écart, affiche le pourquoi puis demande O/N. Chaque correction appliquée est inscrite au journal d'annulation. Utilisez -WhatIf pour une simulation, -Auto pour tout appliquer (lab).",
+   cmd:".\\02-Harden.ps1"},
+  {n:4,file:"01-Audit.ps1 -Phase apres",title:"Re-photographier après",place:"scripts\\",
+   kind:["Lecture seule"],
+   desc:"Relance le même audit pour mesurer l'effet du durcissement. Écrit un rapport « après ».",
+   cmd:".\\01-Audit.ps1 -Phase apres"},
+  {n:5,file:"03-Report.ps1",title:"Rapport avant / après",place:"scripts\\",
+   kind:["Lecture seule","Partageable"],
+   desc:"Fusionne les derniers rapports avant et après en un rapport HTML autonome, prêt à remettre au client, et l'ouvre dans le navigateur.",
+   cmd:".\\03-Report.ps1"},
+  {n:6,file:"99-Undo.ps1",title:"Annuler si besoin",place:"scripts\\",
+   kind:["Réversible"],
+   desc:"Rejoue les annulations enregistrées, dans l'ordre inverse, pour revenir à l'état d'avant durcissement. Interactif par défaut.",
+   cmd:".\\99-Undo.ps1"}
+];
+const pillClass = k => /Lecture/.test(k)?"read":/Modifie/.test(k)?"write":/Réversible/.test(k)?"undo":"";
+document.getElementById("steps").innerHTML = STEPS.map(s=>`
+  <div class="step">
+    <div class="num">${s.n}</div>
+    <h2>${s.title} <span class="file">— ${s.file}</span></h2>
+    <p class="place">À placer dans : <b>${s.place}</b> — exécuter dans un PowerShell administrateur.</p>
+    <p>${s.desc}</p>
+    <div class="cmd"><code>${s.cmd}</code><button data-c="${s.cmd.replace(/"/g,'&quot;')}">Copier</button></div>
+    <div class="tagrow">${s.kind.map(k=>`<span class="pill ${pillClass(k)}">${k}</span>`).join("")}</div>
+  </div>`).join("");
+
+document.querySelectorAll(".cmd button").forEach(b=>b.onclick=async()=>{
+  try{await navigator.clipboard.writeText(b.dataset.c);const t=b.textContent;b.textContent="Copié ✓";setTimeout(()=>b.textContent=t,1200);}catch(e){}
+});
+
+// thème
+const root=document.documentElement, tb=document.getElementById("theme");
+try{const s=localStorage.getItem("ht-theme");if(s)root.setAttribute("data-theme",s);}catch(e){}
+tb.onclick=()=>{const c=root.getAttribute("data-theme")==="dark"?"light":"dark";
+  root.setAttribute("data-theme",c);try{localStorage.setItem("ht-theme",c)}catch(e){}};
+
+// lecture d'un rapport JSON
+const drop=document.getElementById("drop"),file=document.getElementById("file"),view=document.getElementById("view");
+drop.onclick=()=>file.click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add("hot")};
+drop.ondragleave=()=>drop.classList.remove("hot");
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove("hot");if(e.dataTransfer.files[0])read(e.dataTransfer.files[0])};
+file.onchange=()=>{if(file.files[0])read(file.files[0])};
+function badge(s){const m={Conforme:["ok","Conforme"],NonConforme:["ko","Non conforme"]}[s]||["na","N/A"];
+  return `<span class="b ${m[0]}">${m[1]}</span>`}
+function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+function read(f){const r=new FileReader();r.onload=()=>{
+  let d;try{d=JSON.parse(r.result)}catch(e){view.innerHTML="<p class='why'>Fichier illisible.</p>";return;}
+  const rows=(d.Controles||[]).map(c=>`<tr><td class="mono">${esc(c.Id)}</td>
+     <td>${esc(c.Titre)}<div class="why">${esc(c.Pourquoi)}</div></td>
+     <td>${esc(c.Risque)}</td><td>${badge(c.Statut)}</td>
+     <td class="why">${esc(c.Actuel)}</td></tr>`).join("");
+  view.innerHTML=`<div class="kpis">
+     <div class="kpi"><div class="n">${d.Score}%</div><div class="l">Conformité</div></div>
+     <div class="kpi"><div class="n">${d.NonConformes}</div><div class="l">Écarts</div></div>
+     <div class="kpi"><div class="n">${esc(d.Machine)}</div><div class="l">Machine · phase ${esc(d.Phase)}</div></div>
+   </div>
+   <table><thead><tr><th>ID</th><th>Contrôle</th><th>Risque</th><th>Statut</th><th>État relevé</th></tr></thead>
+   <tbody>${rows}</tbody></table>`;
+};r.readAsText(f)}
+</script>
+</body>
+</html>
