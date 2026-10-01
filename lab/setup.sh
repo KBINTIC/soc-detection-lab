@@ -58,10 +58,16 @@ say "Waiting for the manager container"
 until docker compose exec -T wazuh.manager test -f /etc/filebeat/filebeat.yml 2>/dev/null; do sleep 5; done
 sleep 20
 
-if docker compose exec -T wazuh.manager grep -A1 'archives:' /etc/filebeat/filebeat.yml | grep -q 'enabled: false'; then
-  say "Shipping archives to the indexer (wazuh-archives-*)"
-  docker compose exec -T wazuh.manager sed -i '/archives:/{n;s/enabled: false/enabled: true/}' /etc/filebeat/filebeat.yml
-  docker compose restart wazuh.manager
+say "Shipping archives to the indexer (wazuh-archives-*)"
+# Always (re)apply: the manager image can reset filebeat.yml when the container is recreated.
+sleep 40
+docker compose exec -T wazuh.manager sed -i '/archives:/{n;s/enabled: *false/enabled: true/}' /etc/filebeat/filebeat.yml
+docker compose restart wazuh.manager
+sleep 30
+if docker compose exec -T wazuh.manager grep -A1 'archives:' /etc/filebeat/filebeat.yml | grep -q 'enabled: true'; then
+  echo "Archives enabled."
+else
+  echo "WARNING: archives still disabled - re-run this script or see lab/README.md."
 fi
 
 cat <<MSG
