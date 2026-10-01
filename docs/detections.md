@@ -28,7 +28,7 @@ wevtutil cl Security
 powershell.exe -enc VwByAGkAdABlAC0ASABvAHMAdAAgACIAcwBpAGcAbQBhACAAbABhAGIAIAB0AGUAcwB0ACIA
 
 # 4. Local admin group change (make sure group management auditing is on)
-auditpol /set /subcategory:"Security Group Management" /success:enable
+auditpol /set /subcategory:"{0CCE9237-69AE-11D9-BED3-505054503030}" /success:enable   # Security Group Management (works on any Windows language)
 net user labuser 'L@b-Only-2026!' /add
 net localgroup Administrators labuser /add
 net localgroup Administrators labuser /delete

@@ -44,6 +44,8 @@ docker compose down -v                                      # wipe everything
 
 ## 3. Windows VM
 
+**Shortcut**: run `lab/agent/install-lab-agent.ps1` in an elevated PowerShell inside the VM. It installs Sysmon, the Wazuh agent, the extra channels and the audit policies (steps 1 to 3 below).
+
 1. **Sysmon**: download it from Microsoft Sysinternals, copy `lab/agent/sysmon-lab.xml` to the VM, then:
    `Sysmon64.exe -accepteula -i sysmon-lab.xml`
 2. **Wazuh agent**: in the dashboard, go to *Agents management > Deploy new agent > Windows*. Use your Mac's IP
