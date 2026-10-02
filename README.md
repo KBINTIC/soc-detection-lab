@@ -32,6 +32,10 @@ docs/             Detection catalogue, ATT&CK mapping, simulation commands
 
 See the full catalogue with simulation steps in [docs/detections.md](docs/detections.md).
 
+Example of a detection validated end-to-end in the lab (LLMNR re-enabled, Sysmon event 13 found in Wazuh):
+
+![Wazuh detection - LLMNR](docs/screenshots/wazuh-llmnr-1hit.png)
+
 | Area | Detection | ATT&CK |
 |---|---|---|
 | Windows | Defender real-time protection disabled | T1562.001 |

@@ -6,6 +6,16 @@ le durcir **avec validation humaine**, et produire un rapport **avant / après**
 > Principe directeur : **la machine exécute, l'humain décide.** Aucune modification sans accord,
 > le *pourquoi* est affiché avant chaque correction, et tout est réversible.
 
+## Aperçu
+
+Rapport avant / après généré par l'outil (score passé de 56 % à 89 % de conformité) :
+
+![Rapport de durcissement](docs/screenshots/01-rapport-durcissement.png)
+
+Exécution dans PowerShell (audit, durcissement avec validation, re-audit) :
+
+![Exécution](docs/screenshots/02-execution-terminal.png)
+
 ## Interface
 
 Ouvrez `ui/index.html` dans un navigateur. La page présente la séquence dans l'ordre,
