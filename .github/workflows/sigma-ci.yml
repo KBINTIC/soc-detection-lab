@@ -18,8 +18,10 @@ jobs:
       - name: Install sigma-cli and backends
         run: pip install -r requirements.txt
 
-      - name: Validate rules (syntax, ATT&CK tags, best practices)
-        run: sigma check --fail-on-issues rules/
+      - name: Validate rules (syntax and best practices)
+        # attacktag/d3_fendtag validators fetch MITRE data over the network and are
+        # excluded here so the build stays deterministic and offline-safe.
+        run: sigma check --fail-on-issues -x attacktag -x d3_fendtag rules/
 
       - name: Convert rules to Sentinel KQL and Wazuh Lucene
         run: ./scripts/convert.sh
