@@ -28,6 +28,17 @@ Each rule's simulation was run, then the Wazuh query was executed in Discover on
 | Defender real-time protection disabled | Defender 5001 | ⏳ pending (needs Tamper Protection off) |
 | M365 rules (3) | Unified audit log | ⏳ pending (needs a test tenant) |
 
+## Lab evidence
+
+Each Windows detection was validated end-to-end against real events on the lab VM (Windows 11 ARM64, Sysmon, Wazuh agent 4.14.8):
+
+| Rule | Event | Screenshot |
+|---|---|---|
+| Security event log cleared | 1102 | ![1102](screenshots/wazuh-1102-log-cleared.png) |
+| PowerShell with encoded command | Sysmon 1 | ![enc](screenshots/wazuh-powershell-encoded.png) |
+| Member added to local Administrators | 4732 | ![4732](screenshots/wazuh-4732-admin-added.png) |
+| LLMNR re-enabled via registry | Sysmon 13 | ![llmnr](screenshots/wazuh-llmnr-1hit.png) |
+
 ## Simulate (Windows VM, elevated PowerShell)
 
 ```powershell
