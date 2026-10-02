@@ -104,8 +104,7 @@ function Get-SecurityControls {
             Titre='Compte invité désactivé'
             Pourquoi="Un compte invité actif offre un accès anonyme sans traçabilité. Il doit rester désactivé."
             Verifier={
-                $g = Get-LocalUser -SID 'S-1-5-21-*-501' -ErrorAction SilentlyContinue
-                if (-not $g) { $g = Get-LocalUser | Where-Object { $_.SID.Value -like '*-501' } }
+                $g = Get-LocalUser | Where-Object { $_.SID.Value -like '*-501' }
                 if (-not $g) { @{Statut='NA';Actuel='Compte invité introuvable'} }
                 elseif (-not $g.Enabled) { @{Statut='Conforme';Actuel='Invité désactivé'} }
                 else { @{Statut='NonConforme';Actuel='Invité ACTIF'} }
