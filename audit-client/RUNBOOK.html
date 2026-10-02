@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode opératoire — Audit client</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--ink:#17202e;--mut:#5a6677;--line:#e5e9f0;--navy:#1f3b57;--ok:#1a7f52;--warn:#b7791f;--code:#0f1722;--codeink:#d7e2f4}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e131b;--card:#151d28;--ink:#e9edf4;--mut:#9aa6b6;--line:#253040;--navy:#6f92ff;--code:#0a0f16}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:26px 16px 70px}
+h1{font-size:23px;margin:0 0 2px}.lead{color:var(--mut);margin:4px 0 22px}
+.phase{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.phase h2{font-size:16px;margin:0 0 8px;color:var(--navy);display:flex;align-items:center;gap:9px}
+.badge{background:var(--navy);color:#fff;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+ol,ul{margin:6px 0 6px 2px;padding-left:20px}li{margin:4px 0}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:rgba(127,127,127,.14);padding:1px 5px;border-radius:4px}
+pre{background:var(--code);color:var(--codeink);padding:10px 12px;border-radius:8px;overflow:auto;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+.tip{background:color-mix(in srgb,var(--navy) 9%,transparent);border:1px solid color-mix(in srgb,var(--navy) 25%,transparent);border-radius:9px;padding:9px 13px;font-size:14px;margin:8px 0}
+.warn{background:#fff7e6;border:1px solid #f0d9a8;border-radius:9px;padding:9px 13px;font-size:14px;margin:8px 0;color:#7a5b16}
+@media(prefers-color-scheme:dark){.warn{background:#2a2410;color:#e0c583;border-color:#5a4d1e}}
+table{width:100%;border-collapse:collapse;margin-top:8px}th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;color:var(--mut)}.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--mut)}
+.chk{list-style:none;padding-left:0}.chk li{padding-left:26px;position:relative}.chk li:before{content:"☐";position:absolute;left:0;color:var(--navy);font-size:16px}
+</style></head><body><div class="wrap">
+<h1>Mode opératoire — Mission d'audit de sécurité</h1>
+<p class="lead">Audit <b>non intrusif (lecture seule)</b> des postes du client, piloté depuis le Mac consultant.
+Principe : la machine exécute, l'humain décide. Aucune correction n'est appliquée pendant l'audit.</p>
+
+<div class="phase"><h2><span class="badge">0</span> Avant le rendez-vous (au bureau)</h2>
+<ol>
+<li>Double-cliquer sur <code>Demarrer-Audit-Client.command</code>.</li>
+<li>Saisir le <b>nom du client</b> → un dossier de mission daté est créé automatiquement.</li>
+<li>Choix <b>1</b> : brancher une clé USB et copier le kit d'audit dessus.</li>
+<li>Vérifier que la clé contient <code>AuditKit/Lancer-Audit-Windows.bat</code> et <code>AuditKit/audit-poste-mac.command</code>.</li>
+</ol></div>
+
+<div class="phase"><h2><span class="badge">1</span> Sur site, en présence du client</h2>
+<ul>
+<li>Expliquer en une phrase : « L'audit est <b>en lecture seule</b>, il ne modifie rien ; il mesure l'état de sécurité de chaque poste et produit un rapport. »</li>
+<li>Recenser les postes à auditer (PC / Mac). Chaque poste prend <b>environ 30 à 60 secondes</b>.</li>
+</ul>
+<div class="tip">Deux méthodes au choix selon le poste : <b>clé USB</b> (toujours), ou <b>audit à distance</b> si tu es sur le même réseau et que l'accès est activé.</div>
+</div>
+
+<div class="phase"><h2><span class="badge">2</span> Auditer chaque poste</h2>
+<p><b>Poste Windows (clé USB)</b></p>
+<ol>
+<li>Brancher la clé, ouvrir <code>AuditKit</code>.</li>
+<li>Clic droit sur <code>Lancer-Audit-Windows.bat</code> → <b>Exécuter</b> ; accepter l'élévation administrateur.</li>
+<li>Attendre la fin (liste <code>[OK]</code>/<code>[!!]</code>). Le rapport JSON est écrit dans <code>AuditKit/rapports</code>.</li>
+</ol>
+<p><b>Poste Mac (clé USB)</b></p>
+<ol>
+<li>Ouvrir le Terminal, puis : <code>sudo bash /Volumes/&lt;CLE&gt;/AuditKit/audit-poste-mac.command "Nom du client"</code></li>
+<li>Saisir le mot de passe administrateur du poste. Le rapport JSON est écrit dans <code>rapports</code>.</li>
+</ol>
+<p><b>Audit à distance (option, même réseau)</b> — depuis le Mac consultant, choix <b>3</b> : indiquer <code>utilisateur@ip</code> du Mac client (Connexion à distance / SSH activée côté client). Pour un Windows distant, préférer la clé USB.</p>
+<div class="warn">Rien n'est modifié sur les postes : tous les contrôles sont en lecture seule.</div>
+</div>
+
+<div class="phase"><h2><span class="badge">3</span> Rapport d'audit (avant correction)</h2>
+<ol>
+<li>Rapatrier les rapports : clé USB → choix <b>4</b> (importer depuis la clé) ; audit distant → déjà dans la mission.</li>
+<li>Choix <b>5</b> : génération du <b>rapport PDF</b> à ton en-tête, avec nombre de postes (PC/Mac), conformité moyenne, écarts et <b>durée moyenne par poste</b>.</li>
+<li>Présenter / remettre le PDF au client. Il liste aussi les corrections proposées.</li>
+</ol>
+</div>
+
+<div class="phase"><h2><span class="badge">4</span> Validation en lab AVANT toute correction</h2>
+<p>De retour au bureau, chaque correction proposée est <b>d'abord testée sur la VM de lab</b> (jamais directement chez le client) avec la suite de durcissement <code>hardening-toolkit</code> :</p>
+<pre>cd hardening-toolkit\scripts
+.\01-Audit.ps1                 # état de la VM
+.\02-Harden.ps1 -WhatIf        # montre ce qui serait fait, sans rien changer
+.\02-Harden.ps1                # applique après validation (O/N par contrôle)
+.\01-Audit.ps1 -Phase apres
+.\03-Report.ps1                # rapport avant/après de la VM</pre>
+<p>Les commandes à valider correspondent aux identifiants du rapport d'audit :</p>
+<table><thead><tr><th>ID</th><th>Vérifier sur la VM que la correction…</th></tr></thead><tbody>
+<tr><td class="mono">LLMNR-001</td><td>désactive bien LLMNR sans casser la résolution DNS interne.</td></tr>
+<tr><td class="mono">NTLM-001</td><td>passe NTLMv2 (niveau 5) sans bloquer un vieux périphérique réseau (NAS, imprimante).</td></tr>
+<tr><td class="mono">SMB-001</td><td>désactive SMBv1 sans couper un partage legacy encore utilisé.</td></tr>
+<tr><td class="mono">RDP-001</td><td>force NLA sans empêcher un accès distant légitime.</td></tr>
+<tr><td class="mono">PSLOG-001 / AUDIT-001</td><td>active la journalisation attendue (visible dans l'observateur d'événements).</td></tr>
+<tr><td class="mono">BITLOCKER-001 / FV-001</td><td>reste <b>manuelle</b> : activation du chiffrement + sauvegarde de la clé de récupération.</td></tr>
+</tbody></table>
+<div class="tip">Chaque correction est <b>réversible</b> (<code>99-Undo.ps1</code>). On ne planifie l'application chez le client qu'une fois la correction validée en lab.</div>
+</div>
+
+<div class="phase"><h2><span class="badge">5</span> Application chez le client &amp; rapport après</h2>
+<ul>
+<li>Appliquer, poste par poste, uniquement les corrections validées, avec l'accord du client.</li>
+<li>Relancer un audit → générer un <b>rapport après</b> pour mesurer le gain de conformité.</li>
+</ul>
+</div>
+
+<div class="phase"><h2><span class="badge">✓</span> Check-list rapide sur site</h2>
+<ul class="chk">
+<li>Clé USB avec le kit préparée</li>
+<li>Client informé (audit lecture seule)</li>
+<li>Chaque poste audité (PC + Mac)</li>
+<li>Rapports rapatriés dans la mission</li>
+<li>Rapport PDF généré et présenté</li>
+<li>Corrections à valider en lab avant toute application</li>
+</ul>
+</div>
+</div></body></html>
