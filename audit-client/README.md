@@ -14,7 +14,7 @@ piloté depuis le Mac consultant, avec rapport PDF à l'en-tête Bahiri Consulta
    - Mac : `audit-poste-mac.command` (sudo).
    - ou **audit distant** SSH (même réseau).
 3. **Rapport** — rapatrier les rapports JSON, générer le **PDF** (postes PC/Mac, conformité moyenne, écarts, **durée moyenne**).
-4. **Lab** — valider chaque correction sur la VM (`hardening-toolkit`, mode `-WhatIf` puis réel), réversible.
+4. **Lab** — valider chaque correction sur la VM : voir **`CAHIER-VALIDATION-VM.md`** (commande + annulation), puis `hardening-toolkit` (mode `-WhatIf` puis réel), réversible.
 5. **Client** — appliquer les corrections validées, puis rapport après.
 
 Le mode opératoire détaillé et illustré est dans **`RUNBOOK.html`** (ouvert par le menu, choix 6).
@@ -25,6 +25,7 @@ Le mode opératoire détaillé et illustré est dans **`RUNBOOK.html`** (ouvert 
 audit-client/
 ├─ Demarrer-Audit-Client.command   ← orchestrateur (Mac consultant)
 ├─ RUNBOOK.html                    ← mode opératoire pas à pas
+├─ CAHIER-VALIDATION-VM.md         ← chaque correction + commande d'annulation, à tester sur la VM
 ├─ kit/                            ← kit portable (clé USB)
 │  ├─ Audit-Poste-Windows.ps1      ← audit Windows (lecture seule, JSON)
 │  ├─ Lancer-Audit-Windows.bat     ← double-clic côté client Windows
