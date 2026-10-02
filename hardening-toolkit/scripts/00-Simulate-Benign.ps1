@@ -1,4 +1,4 @@
-<#
+﻿<#
   00-Simulate-Benign.ps1
   BUT : générer des événements de sécurité INOFFENSIFS et RÉVERSIBLES, pour
         vérifier que la collecte (Sysmon + agent Wazuh/EDR) et les règles de

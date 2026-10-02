@@ -1,4 +1,4 @@
-<#
+﻿<#
   01-Audit.ps1
   BUT : auditer la configuration de sécurité du poste SANS RIEN MODIFIER.
         Produit un rapport JSON (phase 'avant' par défaut) dans reports\.

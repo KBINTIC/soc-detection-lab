@@ -1,4 +1,4 @@
-# =====================================================================
+﻿# =====================================================================
 #  Controls.ps1 - catalogue des contrôles de sécurité du poste Windows
 #  Chaque contrôle est autonome : il sait se vérifier, se corriger et s'annuler.
 #  Référentiel : bonnes pratiques ANSSI / CIS pour postes TPE/PME.

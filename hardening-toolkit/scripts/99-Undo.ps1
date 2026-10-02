@@ -1,4 +1,4 @@
-<#
+﻿<#
   99-Undo.ps1
   BUT : annuler les corrections appliquées par 02-Harden.ps1, en rejouant
         les commandes d'annulation enregistrées dans le journal undo.

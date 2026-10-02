@@ -1,4 +1,4 @@
-# =====================================================================
+﻿# =====================================================================
 #  Common.ps1 - bibliothèque partagée de la suite d'audit / durcissement
 #  Principe : la machine exécute, l'humain décide.
 #  Chargé par les autres scripts via :  . "$PSScriptRoot\lib\Common.ps1"

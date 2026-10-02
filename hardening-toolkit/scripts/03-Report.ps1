@@ -1,4 +1,4 @@
-<#
+﻿<#
   03-Report.ps1
   BUT : produire un rapport HTML AVANT / APRÈS autonome à partir des deux
         derniers rapports JSON (phase 'avant' et phase 'apres') de reports\.

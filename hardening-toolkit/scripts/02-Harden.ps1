@@ -1,4 +1,4 @@
-<#
+﻿<#
   02-Harden.ps1
   BUT : appliquer le durcissement, contrôle par contrôle.
         Pour chaque écart, le script explique le POURQUOI, puis demande O/N :
