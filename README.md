@@ -1,5 +1,7 @@
 # SOC Detection Lab
 
+[![sigma-ci](https://github.com/KBINTIC/soc-detection-lab/actions/workflows/sigma-ci.yml/badge.svg)](https://github.com/KBINTIC/soc-detection-lab/actions/workflows/sigma-ci.yml)
+
 Detection-as-code for small-business environments (Windows endpoints + Microsoft 365).
 Detection rules are written once in **[Sigma](https://sigmahq.io)**, validated in CI, and converted automatically to:
 
@@ -26,7 +28,19 @@ scripts/          convert.sh: one query file per rule and backend, written to bu
 lab/              Home lab: Wazuh on Docker (macOS), Windows agent, Sysmon and M365 collection configs
 docs/             Detection catalogue, ATT&CK mapping, simulation commands
 .github/workflows CI: validate every rule, convert to both backends, publish the queries as an artifact
+hardening-toolkit/ Windows posture audit + hardening with human validation, reversible, before/after report (FR)
 ```
+
+## Companion tool
+
+The detections cover what an attacker changes; a companion tool covers the posture those detections protect:
+
+**[`hardening-toolkit/`](hardening-toolkit/)** audits a Windows endpoint's security configuration, applies
+hardening only after explicit human approval (the *why* is shown before each change), every change is reversible,
+and a before/after report is produced. Several controls (LLMNR, local admins, Defender) are the same ones the
+Sigma rules watch for being rolled back.
+
+It follows one principle: *the machine executes, the human decides*. Its documentation is in French.
 
 ## Detections
 
